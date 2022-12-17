@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/layout}">
+<head>
+	<title>Recipt</title>
+	<!-- 個別CSS読込 -->
+	<link rel="stylesheet" th:href="@{/css/top.css}">
+	<script type="text/javascript" th:inline="javascript">
+	/*<![CDATA[*/
+		var yyyyMM = /*[[${calendarData.yyyyMM}]]*/"yyyyMM";
+	/*]]>*/
+	</script>
+	<script th:src="@{/webjars/datatables/js/jquery.dataTables.min.js}" defer></script>
+	<script th:src="@{/js/calendar.js}" defer></script>
+</head>
+<body>
+	<div layout:fragment="content">
+		<div class="header border-bottom">
+			<h1 class="h2">Recipt</h1>
+		</div>
+	</div>
+</body>
+</html>
