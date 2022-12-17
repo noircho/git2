@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- Mapperとxmlのマッピング -->
+<mapper namespace="com.example.repository.DataMapper">
+
+  <!-- マッピング定義（データ） -->
+  <resultMap type="com.example.model.ListData" id="listData">
+  	<id column="user_id" property="reciptId" />
+  	<result column="password" property="buyDate" />
+  	<result column="user_name" property="categoryId" />
+  	<result column="birthday" property="itemName" />
+  	<result column="age" property="shopName" />
+  	<result column="gender" property="spentMoney" />
+  	<result column="department_id" property="inputDate" />
+  	<result column="role" property="updateDate" />
+  	<result column="role" property="delFlg" />
+  	<association property="category" resultMap="category" />
+  </resultMap>
+
+  <!-- マッピング定義（費目） -->
+  <resultMap type="com.example.model.MCategory" id="category">
+  	<id column="category_id" property="categoryId" />
+  	<result column="category_name" property="categoryName" />
+  </resultMap>
+
+  <!-- データが存在する年月を抽出 -->
+  <select id="getyyyyMM" resultType="String">
+	select
+		formatdatetime(buy_date, 'yyyyMM') as yyyymm
+	from
+		t_data
+	group by formatdatetime(buy_date, 'yyyyMM')
+	order by formatdatetime(buy_date, 'yyyyMM')
+  </select>
+
+  <!-- データが存在する年月を抽出 -->
+  <select id="getAllListData" resultType="listData">
+	select
+			t_data.recipt_id
+			, t_data.buy_date
+			, t_data.category_id
+			, m_category.category_name
+			, t_data.item_name
+			, t_data.shop_name
+			, t_data.spent_money
+			, t_data.input_date
+			, t_data.update_date
+			, t_data.del_flg
+		from t_data
+		left join m_category
+		on t_data.category_id = m_category.category_id
+	<where>
+  		t_data.del_flg = false
+  	</where>
+		order by t_data.recipt_id
+  </select>
+
+  <!-- 月指定のデータ取得 -->
+  <select id="getMonthListData" resultType="listData">
+		select
+			t_data.recipt_id
+			, t_data.buy_date
+			, t_data.category_id
+			, m_category.category_name
+			, t_data.item_name
+			, t_data.shop_name
+			, t_data.spent_money
+			, t_data.input_date
+			, t_data.update_date
+			, t_data.del_flg
+		from t_data
+		left join m_category
+		on t_data.category_id = m_category.category_id
+  	<where>
+  		formatdatetime(t_data.buy_date,'yyyyMM') = #{yyyyMM}
+  	</where>
+  		order by t_data.recipt_id
+  </select>
+  
+   <!-- ひと月における日付ごとの金額データを取得 -->
+  <select id="getMonthDateMoneyData" resultType="hashmap">
+	select 
+		formatdatetime(buy_date, 'dd') as dd
+		, sum(spent_money) as sum
+	from 
+		t_data
+  	<where>
+		formatdatetime(buy_date, 'yyyyMM') = #{yyyyMM}
+	</where>
+	group by formatdatetime(buy_date, 'yyyyMMdd')
+	order by formatdatetime(buy_date, 'dd')
+  </select>
+  
+  <!-- ひと月における費目ごとの金額データを取得 -->
+  <select id="getMonthCategoryMoneyData" resultType="hashmap">
+	select 
+		m_category.category_name as category_name
+		, sum(t_data.spent_money) as sum
+	from 
+		t_data
+	left join
+		m_category
+	on t_data.category_id = m_category.category_id
+  	<where>
+		formatdatetime(t_data.buy_date, 'yyyyMM') = #{yyyyMM}
+	</where>
+	group by t_data.category_id
+	order by t_data.category_id
+  </select>
+  
+  <!-- 一括削除 -->
+  <delete id="deleteListData">
+  	delete from
+  		t_data
+  </delete>
+  
+    <!-- データ1件登録(csvから) -->
+  <insert id="insertListData">
+	insert into t_data (
+		item_id
+		, recipt_id
+		, buy_date
+		, category_id
+		, item_name
+		, shop_name
+		, spent_money
+		, input_date
+		, update_date
+		, del_flg
+	)
+	select
+		#{itemId}
+		, #{reciptId}
+		, #{buyDate}
+		, category_id
+		, #{itemName}
+		, #{shopName}
+		, #{spentMoney}
+		, #{inputDate}
+		, #{updateDate}
+		, #{delFlg}
+	from m_category
+  <where>
+		category_name = #{categoryName}
+  </where>
+  </insert>
+  
+  <!-- 全データ抽出 -->
+  <select id="getAllTData" resultType="TData">
+	select
+		recipt_id
+		, buy_date
+		, category_id
+		, item_name
+		, shop_name
+		, spent_money
+		, input_date
+		, update_date
+		, del_flg
+	from
+		t_data
+	order by recipt_id
+  </select>
+</mapper>
