@@ -7,6 +7,7 @@
 	-->
 	<link rel="stylesheet" th:href="@{/webjars/datatables/css/jquery.dataTables.min.css}">
 	<script th:src="@{/webjars/datatables/js/jquery.dataTables.min.js}" defer></script>
+	<script th:src="@{/js/csv.js}" defer></script>
 </head>
 <body>
 	<div layout:fragment="content">
@@ -15,10 +16,11 @@
 		</div>
 		<p>CSV列設定：レシートID,日付,費目名,支払元,入金先,品目,店舗名,支出金額,収入金額,?,?,?</p>	
 		<p>DB列設定：レシートID,日付,費目コード,品目,店舗名,支出金額,作成日,更新費,削除フラグ</p>	
- 		<form method="post" action="/recipt/csv/upload" enctype="multipart/form-data">
-        	<input type="file" name="file">
-        	<input type="submit" name="upload_file" value="ファイルをアップロード">
-    	</form>
+ 		<form method="post" action="/recipt/csv/upload" enctype="multipart/form-data">-->
+			<button id="upload_file">ファイル選択・アップロード</button>
+        	<input type="file" name="file" id="file" onchange="changeFile(this);">
+        	<!--<input type="submit" name="upload_file" value="ファイルをアップロード">-->
+        </form>
 	</div>
 </body>
 </html>

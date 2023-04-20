@@ -23,7 +23,7 @@ import com.example.model.CsvTData;
 import com.example.service.ListDataService;
 
 @Controller
-@RequestMapping("/recipt")
+@RequestMapping("/recipt/csv")
 public class CsvController{
 	
 	@Autowired
@@ -32,13 +32,13 @@ public class CsvController{
     //@Autowired
     //DownloadHelper downloadHelper;
 	
-	@GetMapping("/csv")
+	@GetMapping("")
 	public String getCsvView() {	
 	    return "recipt/csv";
 	}
 	
-	@PostMapping(value = "/csv/upload", params = "upload_file")
-	public String updateUser(@RequestParam("file") MultipartFile uploadFile) {
+	@PostMapping("/upload")
+	public int updateUser(@RequestParam("file") MultipartFile uploadFile) {
 		// 現在のT_DATAをダウンロード
 		//try {
 			//download();
@@ -92,15 +92,23 @@ public class CsvController{
 		      throw new RuntimeException("ファイルが読み込めません", e);
 		    }	
 		Integer cnt = i - 1;
-		// 登録開始
-		for(int j = 0; j < dataList.size(); j++) {
-			CsvTData tData = dataList.get(j);
-			tData.setItemId(Integer.toString(cnt));
-			listDataService.insertListData(tData);
-			cnt--;
-		}		 
+		
+		try {
+			listDataService.deleteListData();
+			// 登録開始
+			for(int j = 0; j < dataList.size(); j++) {
+				CsvTData tData = dataList.get(j);
+				tData.setItemId(Integer.toString(cnt));
+				listDataService.insertListData(tData);
+				cnt--;
+			}		
+		} catch(Exception e) {
+			//データベース更新中に異常終了
+		}
+		
+ 
 		// ユーザー一覧画面にリダイレクト
-		return "redirect:/recipt/csv";
+		return 0;
 	}
 	/*
 	public String getCsvText() {
